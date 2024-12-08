@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviewfilmes
+  labels:
+    app: reviewfilmes
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: reviewfilmes
+  template:
+    metadata:
+      labels:
+        app: reviewfilmes
+    spec:
+      containers:
+        - name: reviewfilmes
+          image: fabricioveronez/rv-teste:latest
+          env:
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "8080"
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: reviewfilmes-secret
+                  key: DefaultConnection
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
