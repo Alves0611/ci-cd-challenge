@@ -18,3 +18,29 @@ jobs:
       - name: Running unit tests
         working-directory: ./src
         run: dotnet test ./Review-Filmes.Test.Unit/Review-Filmes.Test.Unit.csproj
+
+  integration-test: 
+    runs-on: ubuntu-latest
+    services: 
+      postgres: 
+        image: postgres
+        env: 
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        ports: 
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.300'
+        env: 
+          ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${{ secrets.POSTGRES_DB }};Username=${{ secrets.POSTGRES_USER }};Password=${{ secrets.POSTGRES_PASSWORD }}"
+
+      - name: Running integration tests
+        working-directory: ./src
+        run: dotnet test ./Review-Filmes.Test.Integration/Review-Filmes.Test.Integration.csproj
