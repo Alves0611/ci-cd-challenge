@@ -44,3 +44,31 @@ jobs:
         run: dotnet test ./Review-Filmes.Test.Integration/Review-Filmes.Test.Integration.csproj
         env: 
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=review-filmes;Username=review;Password=postgrespwd"
+
+  sonarqube: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+
+      - name: Set up dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.300'
+      
+      - name: Running sonarqube
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+      
+      - name: Build and analyze
+        working-directory: ./src
+        run: |
+          dotnet sonarscanner begin /k:"reviewfilmes" /d:sonar.host.url="http://sonarqube.localhost.com"  /d:sonar.token="sqp_e7d367cd57f46dfba11f83359f28ced00fb1c05a"
+          dotnet build Review-Filmes.sln
+          dotnet sonarscanner end /d:sonar.token="sqp_e7d367cd57f46dfba11f83359f28ced00fb1c05a"
