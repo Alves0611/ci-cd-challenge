@@ -2,10 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgre
-spec: 
+  labels:
+    app: postgre
+spec:
   replicas: 1
   selector:
-    matchLabels: 
+    matchLabels:
       app: postgre
   template:
     metadata:
@@ -16,11 +18,44 @@ spec:
         - name: postgre
           image: postgres:13.1
           env:
-          - name: POSTGRES_PASSWORD
-            value: Passw0rd2024!
-          - name: POSTGRES_USER
-            value: reviewfilmes
-          - name: POSTGRES_DB
-            value: reviewfilmes
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgre-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgre-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgre-secret
+                  key: POSTGRES_DB
           ports:
             - containerPort: 5432
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
