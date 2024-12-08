@@ -49,5 +49,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/review-filmes:latest 
             ${{ secrets.DOCKER_USERNAME }}/review-filmes:${{ github.sha }}
-
-      
