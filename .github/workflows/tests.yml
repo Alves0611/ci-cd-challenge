@@ -39,17 +39,7 @@ jobs:
         with:
           dotnet-version: '8.0.300'
         env: 
-          ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${{ secrets.POSTGRES_DB }};Username=${{ secrets.POSTGRES_USER }};Password=${{ secrets.POSTGRES_PASSWORD }}"
-
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          for i in {1..10}; do
-            ping -c 1 postgres && nc -z postgres 5432 && echo "PostgreSQL is up" && exit 0
-            echo "Waiting for PostgreSQL..."
-            sleep 3
-          done
-          echo "PostgreSQL failed to start" && exit 1
-  
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=${{ secrets.POSTGRES_DB }};Username=${{ secrets.POSTGRES_USER }};Password=${{ secrets.POSTGRES_PASSWORD }}"
 
       - name: Running integration tests
         working-directory: ./src
