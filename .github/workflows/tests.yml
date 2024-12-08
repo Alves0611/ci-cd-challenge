@@ -1,9 +1,7 @@
 name: running tests
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
   unit-test:
